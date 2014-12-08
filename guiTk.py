@@ -55,20 +55,14 @@ class Variables():
         for i, col in enumerate(csv.T):
             self.variables.append(Variable(i, col))
 
-    def setSelectedType(self, index, newType):
-        if newType == self.variables[i].selectedType:
-            return None
-        elif newType == 'Binary DV':
+    def setSelectedType(self, variable):
+        if variable.selectedType.get() == 'Binary DV':
             if not self.indexDV == None:
-                self.variables[indexDV].selectedType.set(self.variables[indexDV].defaultType)
-            self.variables[index].selectedType.set(newType)
-        elif self.newType == 'Scalar IV':
-            if not self.variables[index].defaultType == 'Scalar IV':
-                return None
-            else:
-                self.variables[index].selectedType.set(newType)
-        else:
-            self.selectedType = newType
+                self.variables[self.indexDV].selectedType.set(self.variables[self.indexDV].defaultType)
+            self.indexDV = variable.index
+        elif variable.selectedType.get() == 'Scalar IV':
+            if not variable.defaultType == 'Scalar IV':
+                variable.selectedType.set(variable.defaultType)
 
 class Gui(Frame):
   
@@ -139,10 +133,10 @@ class Gui(Frame):
                 label = Label(self.varFrame, text=v.name, fg="blue")
                 label.grid(row=v.index+1, column=0, sticky=W)
                 label.bind("<Button-1>", lambda event, v = v: self.clickHeader(v))
-                Radiobutton(self.varFrame, variable=v.selectedType, value='Scalar IV', command=lambda v = v: self.selectVarType(v)).grid(row=v.index+1, column=1, sticky=W)
-                Radiobutton(self.varFrame, variable=v.selectedType, value='Categorical IV', command=lambda v = v: self.selectVarType(v)).grid(row=v.index+1, column=2, sticky=W)
-                Radiobutton(self.varFrame, variable=v.selectedType, value='Binary DV', command=lambda v = v: self.selectVarType(v)).grid(row=v.index+1, column=3, sticky=W)
-                Radiobutton(self.varFrame, variable=v.selectedType, value='Skip', command=lambda v = v: self.selectVarType(v)).grid(row=v.index+1, column=4, sticky=W)
+                Radiobutton(self.varFrame, variable=v.selectedType, value='Scalar IV', command=lambda v = v: self.clickRadio(v)).grid(row=v.index+1, column=1, sticky=W)
+                Radiobutton(self.varFrame, variable=v.selectedType, value='Categorical IV', command=lambda v = v: self.clickRadio(v)).grid(row=v.index+1, column=2, sticky=W)
+                Radiobutton(self.varFrame, variable=v.selectedType, value='Binary DV', command=lambda v = v: self.clickRadio(v)).grid(row=v.index+1, column=3, sticky=W)
+                Radiobutton(self.varFrame, variable=v.selectedType, value='Skip', command=lambda v = v: self.clickRadio(v)).grid(row=v.index+1, column=4, sticky=W)
 
     def clickHeader(self, variable):
        
@@ -157,7 +151,8 @@ class Gui(Frame):
        button.pack()
        return None
 
-    def selectVarType(self, variable):
+    def clickRadio(self, variable):
+        self.variables.setSelectedType(variable)
         print "{} to {}".format(variable.name, variable.selectedType.get())
 
     def onExit(self):
