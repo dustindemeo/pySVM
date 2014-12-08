@@ -4,6 +4,71 @@ import numpy as np
 import itertools
 from sklearn.svm import SVC
 
+def isNumber(n):
+    try:
+        float(n)
+        return True
+    except ValueError:
+        return False
+
+class Variable():
+
+    def __init__(self, index, column):
+        self.index = index
+        self.name = column[0]
+        self.values = column[1:,]
+        self.defaultType = self.getDefaultType(self.values)
+        self.selectedType = IntVar().set(self.defaultType)        #this should be the radiobutton value
+        #self.catDict = makeCatDict(self.values)
+        #self.numEmpty = countEmpty(self.values)
+
+    def makeCatDict(self, values):
+        catDict = {}
+        i = 0
+        for v in values:
+            if v not in catDict:
+                catDict[v] = i
+                i += 1
+        return catDict
+
+    def getDefaultType(self, values):
+        for v in values:
+            if v == '':
+                pass
+            elif not isNumber(v):
+                return 'Categorical IV'
+        return 'Scalar IV'
+
+    def countEmpty(self, values):
+        numEmpty = 0
+        for v in values:
+            if v == '':
+                numEmpty += 1
+        return numEmpty
+
+class Variables():
+
+    def __init__(self, csv):
+        self.indexDV = None
+        self.variables = []
+        for i, col in enumerate(csv.T):
+            self.variables.append(Variable(i, col))
+
+    def setSelectedType(self, index, newType):
+        if newType == self.variables[i].selectedType:
+            return None
+        elif newType == 'Binary DV':
+            if not self.indexDV == None:
+                self.variables[indexDV].selectedType.set(self.variables[indexDV].defaultType)
+            self.variables[index].selectedType.set(newType)
+        elif self.newType == 'Scalar IV':
+            if not self.variables[index].defaultType == 'Scalar IV':
+                return None
+            else:
+                self.variables[index].selectedType.set(newType)
+        else:
+            self.selectedType = newType
+
 class Gui(Frame):
   
     def __init__(self, master):
@@ -39,10 +104,10 @@ class Gui(Frame):
         self.varCanvas.pack(fill=BOTH, expand=1, side=LEFT)
 
         Label(self.varFrame, text="Column Header").grid(row=0, column=0, sticky=W)
-        Label(self.varFrame, text="S IV").grid(row=0, column=1, sticky=W)
-        Label(self.varFrame, text="C IV").grid(row=0, column=2, sticky=W)
-        Label(self.varFrame, text=" DV ").grid(row=0, column=3, sticky=W)
-        Label(self.varFrame, text="Skip").grid(row=0, column=4, sticky=W)
+        Label(self.varFrame, text="  Scalar\n    IV").grid(row=0, column=1, sticky=W)
+        Label(self.varFrame, text="Categorical\n    IV").grid(row=0, column=2, sticky=W)
+        Label(self.varFrame, text="  Binary\n    DV").grid(row=0, column=3, sticky=W)
+        Label(self.varFrame, text="\n     Skip").grid(row=0, column=4, sticky=W)
 
 	self.topRightFrame = LabelFrame(self.master, text='2. Manage Dependent Variable')
         self.topRightFrame.grid(row=0, column=2, sticky=NSEW)
@@ -68,37 +133,36 @@ class Gui(Frame):
         if filename != '':
 
             self.csv = openCSV(filename)
+            self.variables = Variables(self.csv)
 
-            for i, header in enumerate(headers(self.csv)):
-                label= Label(self.varFrame, text=header, fg="blue")
-                label.grid(row=i+1, column=0, sticky=W)
-                label.bind("<Button-1>", lambda event, i = i, header = header: self.clickHeader(i, header))
+            for v in self.variables.variables:
+                label = Label(self.varFrame, text=v.name, fg="blue")
+                label.grid(row=v.index+1, column=0, sticky=W)
+                label.bind("<Button-1>", lambda event, v = v: self.clickHeader(v))
                 self.varTypes.append(IntVar())
-                Radiobutton(self.varFrame, variable=self.varTypes[-1], value=0, command=lambda i=i, j=0: self.changeVarType(i, j)).grid(row=i+1, column=1, sticky=W)
-                Radiobutton(self.varFrame, variable=self.varTypes[-1], value=1, command=lambda i=i, j=1: self.changeVarType(i, j)).grid(row=i+1, column=2, sticky=W)
-                Radiobutton(self.varFrame, variable=self.varTypes[-1], value=2, command=lambda i=i, j=2: self.changeVarType(i, j)).grid(row=i+1, column=3, sticky=W)
-                Radiobutton(self.varFrame, variable=self.varTypes[-1], value=3, command=lambda i=i, j=3: self.changeVarType(i, j)).grid(row=i+1, column=4, sticky=W)
+                Radiobutton(self.varFrame, vvariable=v.selectedType, value='Scalar IV', command=lambda v = v: self.selectVarType(v)).grid(row=v.index+1, column=1, sticky=W)
+                Radiobutton(self.varFrame, vvariable=v.selectedType, value='Categorical IV', command=lambda v = v: self.selectVarType(v)).grid(row=v.index+1, column=2, sticky=W)
+                Radiobutton(self.varFrame, vvariable=v.selectedType, value='Binary DV', command=lambda v = v: self.selectVarType(v)).grid(row=v.index+1, column=3, sticky=W)
+                Radiobutton(self.varFrame, vvariable=v.selectedType, value='Skip', command=lambda v = v: self.selectVarType(v)).grid(row=v.index+1, column=4, sticky=W)
 
-    def clickHeader(self, col, header):
+    def clickHeader(self, variable):
        
        top = Toplevel()
-       top.title(header)
+       top.title(variable.name)
 
-       data = '\n'.join(self.csv[:,col])
-       msg = Message(top, text=data)
+       values = '\n'.join(variable.values)
+       msg = Message(top, text=values)
        msg.pack()
 
        button = Button(top, text="Dismiss", command=top.destroy)
        button.pack()
        return None
 
-    def changeVarType(self, i, newType):
-        print "{} to {}".format(i, newType)
+    def selectVarType(self, variable):
+        print "{} to {}".format(variable.name, variable.selectedType)
 
     def onExit(self):
 
-        for v in self.varTypes:
-          print v.get()
         self.quit()
 
 def openCSV(filename):
