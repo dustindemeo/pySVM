@@ -1,4 +1,11 @@
 from Tkinter import *
+import re
+
+'''From http://stackoverflow.com/questions/5254021/python-human-sort-of-numbers-with-alpha-numeric-but-in-pyqt-and-a-lt-oper'''
+def humanKey(key):
+    parts = re.split('(\d*\.\d+|\d+)', key)
+    return tuple((e.swapcase() if i % 2 == 0 else float(e))
+        for i, e in enumerate(parts))
 
 class SplitWindow(Frame):
     def __init__(self, master):
@@ -54,8 +61,7 @@ class SplitWindow(Frame):
             self.leftListbox.delete(row, None)
             self.leftListbox.selection_clear(0, END)
             self.rightListbox.selection_clear(0, END)
-            self.rightListbox.selection_set(END, None)
-            self.rightListbox.see(END)
+            self.sortRight()
         return 'break'
 
     def doubleRight(self, y):
@@ -66,8 +72,7 @@ class SplitWindow(Frame):
             self.rightListbox.delete(row, None)
             self.rightListbox.selection_clear(0, END)
             self.leftListbox.selection_clear(0, END)
-            self.leftListbox.selection_set(END, None)
-            self.leftListbox.see(END)
+            self.sortLeft()
         return 'break'
 
     def scrollLeft(self, *args):
@@ -78,9 +83,25 @@ class SplitWindow(Frame):
 
     def insertLeft(self, index, value):
         self.leftListbox.insert(index, value)
+        self.sortLeft()
 
     def insertRight(self, index, value):
         self.rightListbox.insert(index, value)
+        self.sortRight()
+
+    def sortLeft(self):
+        temp = list(self.leftListbox.get(0, END))
+        temp.sort(key=humanKey)
+        self.leftListbox.delete(0, END)
+        for i in temp:
+            self.leftListbox.insert(END, i)
+
+    def sortRight(self):
+        temp = list(self.rightListbox.get(0, END))
+        temp.sort(key=humanKey)
+        self.rightListbox.delete(0, END)
+        for i in temp:
+            self.rightListbox.insert(END, i)
 
 if __name__ == '__main__':
     tk = Tk()
