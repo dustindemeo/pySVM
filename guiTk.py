@@ -3,6 +3,9 @@ import tkFileDialog
 import numpy as np
 import itertools
 from sklearn.svm import SVC
+from sklearn import preprocessing
+from SplitWindow import SplitWindow
+import SVM
 
 def isNumber(n):
     try:
@@ -17,23 +20,23 @@ class Variable():
         self.index = index
         self.name = column[0]
         self.values = column[1:,]
-        self.defaultType = self.getDefaultType(self.values)
-        self.selectedType = StringVar()                         #this should be the radiobutton value
+        self.defaultType = self.getDefaultType()
+        self.selectedType = StringVar()
         self.selectedType.set(self.defaultType)
-        #self.catDict = makeCatDict(self.values)
+        self.catDict = None
         #self.numEmpty = countEmpty(self.values)
 
-    def makeCatDict(self, values):
+    def makeCatDict(self):
         catDict = {}
         i = 0
-        for v in values:
+        for v in self.values:
             if v not in catDict:
                 catDict[v] = i
                 i += 1
         return catDict
 
-    def getDefaultType(self, values):
-        for v in values:
+    def getDefaultType(self):
+        for v in self.values:
             if v == '':
                 pass
             elif not isNumber(v):
@@ -47,23 +50,6 @@ class Variable():
                 numEmpty += 1
         return numEmpty
 
-class Variables():
-
-    def __init__(self, csv):
-        self.indexDV = None
-        self.variables = []
-        for i, col in enumerate(csv.T):
-            self.variables.append(Variable(i, col))
-
-    def setSelectedType(self, variable):
-        if variable.selectedType.get() == 'Binary DV':
-            if not self.indexDV == None:
-                self.variables[self.indexDV].selectedType.set(self.variables[self.indexDV].defaultType)
-            self.indexDV = variable.index
-        elif variable.selectedType.get() == 'Scalar IV':
-            if not variable.defaultType == 'Scalar IV':
-                variable.selectedType.set(variable.defaultType)
-
 class Gui(Frame):
   
     def __init__(self, master):
@@ -75,7 +61,8 @@ class Gui(Frame):
       
         self.rowMask = []
         self.colMask = []
-        self.colDV = None
+        self.indexDV = None
+        self.variables = []
 
         self.master.title("pySVM")
         
@@ -105,15 +92,83 @@ class Gui(Frame):
 
 	self.topRightFrame = LabelFrame(self.master, text='2. Manage Dependent Variable')
         self.topRightFrame.grid(row=0, column=2, sticky=NSEW)
-        self.dvFrame = Frame(self.topRightFrame, background='green')
+        self.dvFrame = SplitWindow(self.topRightFrame, background='green')
         self.dvFrame.pack(fill=BOTH, expand=1, side=LEFT)
-        Label(self.dvFrame, text='dv').pack()
+        #Label(self.dvFrame, text='dv').pack()
 
         self.bottomFrame = LabelFrame(self.master, text='3. Manage SVM')
         self.bottomFrame.grid(row=1, column=0, columnspan=3, sticky=NSEW)
         self.svmFrame = Frame(self.bottomFrame, background='red')
         self.svmFrame.pack(fill=BOTH, expand=1, side=LEFT)
-        Label(self.svmFrame, text='svm').pack()
+        Button(self.svmFrame, text='Process', command=self.process).pack()
+
+    def getMaskRow(self):
+        maskRow = set()
+        for variable in self.variables:
+            if not variable.selectedType.get() == 'Skip':
+                for i, value in enumerate(variable.values):
+                    if value == '':
+                        maskRow.add(i)
+        return list(maskRow)
+
+    def process(self):
+        maskRow = self.getMaskRow()
+        # - 1 because of header row in csv
+        # could also do numRow = len(self.variables[0].values)a- len(maskRow)
+        numRow = len(self.csv) - len(maskRow) - 1
+        numSIV = 0
+        numCIV = 0
+        for variable in self.variables:
+            if variable.selectedType.get() == 'Scalar IV':
+                numSIV += 1
+            elif variable.selectedType.get() == 'Categorical IV':
+                numCIV += 1
+        SIV = np.empty(shape=(numRow,numSIV))
+        i = 0
+        for variable in self.variables:
+            if variable.selectedType.get() == 'Scalar IV':
+                SIV[:,i] = np.delete(np.asarray(variable.values).T, maskRow, axis=0)
+                i += 1
+        
+        CIV = np.empty(shape=(numRow,numCIV))
+        i = 0
+        for variable in self.variables:
+            if variable.selectedType.get() == 'Categorical IV':
+                variable.catDict = variable.makeCatDict()
+                temp = []
+                for v in variable.values:
+                    temp.append(variable.catDict[v])
+                CIV[:,i] = np.delete(np.asarray(temp).T, maskRow, axis=0)
+                i += 1
+
+        self.stdScaler = preprocessing.StandardScaler().fit(SIV)
+        sSIV = self.stdScaler.transform(SIV)
+
+        self.encScaler = preprocessing.OneHotEncoder().fit(CIV)
+        eCIV = self.encScaler.transform(CIV).toarray()
+
+        X = np.concatenate((sSIV, eCIV), axis=1)
+
+        self.variables[self.indexDV].catDict = self.dvFrame.makeCatDict()
+        print self.variables[self.indexDV].catDict
+        temp = []
+        for v in self.variables[self.indexDV].values:
+            temp.append(self.variables[self.indexDV].catDict[v])
+        y = np.delete(np.asarray(temp).T, maskRow, axis=0)
+
+        SVM.skSVM(X, y)
+
+    def setSelectedType(self, variable):
+        if variable.selectedType.get() == 'Binary DV' and not self.indexDV == variable.index:
+            if not self.indexDV == None:
+                self.variables[self.indexDV].selectedType.set(self.variables[self.indexDV].defaultType)
+            self.indexDV = variable.index
+            variable.catDict = variable.makeCatDict()
+            self.dvFrame.clear()
+            self.dvFrame.insertListRight(variable.catDict.keys())
+        elif variable.selectedType.get() == 'Scalar IV':
+            if not variable.defaultType == 'Scalar IV':
+                variable.selectedType.set(variable.defaultType)
 
     def AuxscrollFunction(self, event):
         self.varCanvas.configure(scrollregion=self.varCanvas.bbox("all"))
@@ -127,9 +182,10 @@ class Gui(Frame):
         if filename != '':
 
             self.csv = openCSV(filename)
-            self.variables = Variables(self.csv)
+            for i, col in enumerate(self.csv.T):
+                self.variables.append(Variable(i, col))
 
-            for v in self.variables.variables:
+            for v in self.variables:
                 label = Label(self.varFrame, text=v.name, fg="blue")
                 label.grid(row=v.index+1, column=0, sticky=W)
                 label.bind("<Button-1>", lambda event, v = v: self.clickHeader(v))
@@ -152,7 +208,7 @@ class Gui(Frame):
        return None
 
     def clickRadio(self, variable):
-        self.variables.setSelectedType(variable)
+        self.setSelectedType(variable)
         print "{} to {}".format(variable.name, variable.selectedType.get())
 
     def onExit(self):
@@ -173,7 +229,7 @@ def main():
     root.columnconfigure(0, weight=1)
     root.rowconfigure(0, weight=1)
     gui = Gui(root)
-    root.geometry("800x640+10+10")
+    root.geometry("1000x650+10+10")
     root.mainloop()  
 
 if __name__ == '__main__':
