@@ -6,49 +6,7 @@ from sklearn.svm import SVC
 from sklearn import preprocessing
 from SplitWindow import SplitWindow
 import SVM
-
-def isNumber(n):
-    try:
-        float(n)
-        return True
-    except ValueError:
-        return False
-
-class Variable():
-
-    def __init__(self, index, column):
-        self.index = index
-        self.name = column[0]
-        self.values = column[1:,]
-        self.defaultType = self.getDefaultType()
-        self.selectedType = StringVar()
-        self.selectedType.set(self.defaultType)
-        self.catDict = None
-        #self.numEmpty = countEmpty(self.values)
-
-    def makeCatDict(self):
-        catDict = {}
-        i = 0
-        for v in self.values:
-            if v not in catDict:
-                catDict[v] = i
-                i += 1
-        return catDict
-
-    def getDefaultType(self):
-        for v in self.values:
-            if v == '':
-                pass
-            elif not isNumber(v):
-                return 'Categorical IV'
-        return 'Scalar IV'
-
-    def countEmpty(self, values):
-        numEmpty = 0
-        for v in values:
-            if v == '':
-                numEmpty += 1
-        return numEmpty
+from Variable import Variable
 
 class Gui(Frame):
   
@@ -59,8 +17,6 @@ class Gui(Frame):
         
     def initUI(self):
       
-        self.rowMask = []
-        self.colMask = []
         self.indexDV = None
         self.variables = []
 
@@ -94,7 +50,6 @@ class Gui(Frame):
         self.topRightFrame.grid(row=0, column=2, sticky=NSEW)
         self.dvFrame = SplitWindow(self.topRightFrame, background='green')
         self.dvFrame.pack(fill=BOTH, expand=1, side=LEFT)
-        #Label(self.dvFrame, text='dv').pack()
 
         self.bottomFrame = LabelFrame(self.master, text='3. Manage SVM')
         self.bottomFrame.grid(row=1, column=0, columnspan=3, sticky=NSEW)
@@ -147,6 +102,8 @@ class Gui(Frame):
         self.encScaler = preprocessing.OneHotEncoder().fit(CIV)
         eCIV = self.encScaler.transform(CIV).toarray()
 
+        #Use eSIV and eCIV if you want scaled and encoded data
+        #X = np.concatenate((SIV, CIV), axis=1)
         X = np.concatenate((sSIV, eCIV), axis=1)
 
         self.variables[self.indexDV].catDict = self.dvFrame.makeCatDict()
