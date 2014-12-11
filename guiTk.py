@@ -54,21 +54,8 @@ class Gui(Frame):
 
         self.bottomFrame = LabelFrame(self.master, text='3. Manage SVM')
         self.bottomFrame.grid(row=1, column=0, columnspan=3, sticky=NSEW)
-        self.svmFrame = Frame(self.bottomFrame, background='red')
+        self.svmFrame = SVMWindow(self.bottomFrame)
         self.svmFrame.pack(fill=BOTH, expand=1, side=LEFT)
-        Label(self.svmFrame, text='Kernel').grid(column=0, row=0, sticky=W)
-        Checkbutton(self.svmFrame, text='rbf').grid(column=0, row=1, sticky=W)
-        Checkbutton(self.svmFrame, text='linear').grid(column=0, row=2, sticky=W)
-        Checkbutton(self.svmFrame, text='poly').grid(column=0, row=3, sticky=W)
-        Checkbutton(self.svmFrame, text='sigmoid').grid(column=0, row=4, sticky=W)
-        Checkbutton(self.svmFrame, text='precomputed').grid(column=0, row=5, sticky=W)
-        Label(self.svmFrame, text='C', anchor=E).grid(column=1, row=0, sticky=E)
-        Entry(self.svmFrame, justify=RIGHT).grid(column=1, row=1, sticky=E)
-        Entry(self.svmFrame, justify=RIGHT).grid(column=1, row=2, sticky=E)
-        Entry(self.svmFrame, justify=RIGHT).grid(column=1, row=3, sticky=E)
-        Entry(self.svmFrame, justify=RIGHT).grid(column=1, row=4, sticky=E)
-        Entry(self.svmFrame, justify=RIGHT).grid(column=1, row=5, sticky=E)
-        Button(self.svmFrame, text='Process', command=self.process).grid(column=0, row=6, sticky=EW)
 
     def getMaskRow(self):
         maskRow = set()
