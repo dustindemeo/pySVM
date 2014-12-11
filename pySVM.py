@@ -105,17 +105,17 @@ import pdb
 # Now perform "gridding" to help find the best SVM kernel and parameters.
 """
 The following variables specify the kernels that we wish to test for.
-"""
+
 tuned_parameters = [{'kernel': ['rbf'], 'gamma': [0.0, 1e-2, 1e-3, 1e-4], 'C': [1, 10, 100, 1000, 10000] }, \
                     {'kernel': ['linear'], 'C': [1, 10, 100, 1000, 10000] }, \
                     {'kernel': ['poly'], 'degree': [1, 2, 3], 'coef0': [0.0, 1., 2.], 'C': [1, 10, 100, 1000, 10000] }, \
                     {'kernel': ['sigmoid'], 'degree': [1, 2, 3],  'coef0': [0.0, 1., 2.],  'gamma': [0.0, 1e-2, 1e-3, 1e-4], 'C': [1, 10, 100, 1000, 10000]}  ]
-"""
+
 tuned_parameters = [{'kernel': ['rbf'], 'gamma': [0.0, 1e-2], 'C': [1, 10] },\
                     {'kernel': ['linear'], 'C': [1, 10] }]
-
-tuned_parameters = [{'kernel': ['rbf'], 'gamma': [0.0, 1e-2, 1e-3, 1e-4], 'C': [1, 10, 100] }]
 """
+tuned_parameters = [{'kernel': ['rbf'], 'gamma': [0.0, 1e-2, 1e-3, 1e-4], 'C': [1, 10, 100] }]
+
 
 # What types of scores do we wist to optimize for
 scores = [ ('accuracy', 'accuracy'), ('average_precision', 'average_precision'), ('recall', 'recall')]
