@@ -5,7 +5,7 @@ import itertools
 from sklearn.svm import SVC
 from sklearn import preprocessing
 from SplitWindow import SplitWindow
-from SVMWindow import SVMWindow
+from SVMWindow import SVMRow
 import SVM
 from Variable import Variable
 
@@ -54,7 +54,7 @@ class Gui(Frame):
 
         self.bottomFrame = LabelFrame(self.master, text='3. Manage SVM')
         self.bottomFrame.grid(row=1, column=0, columnspan=3, sticky=NSEW)
-        self.svmFrame = SVMWindow(self.bottomFrame)
+        self.svmFrame = SVMRow(self.bottomFrame)
         self.svmFrame.pack(fill=BOTH, expand=1, side=LEFT)
 
     def getMaskRow(self):
