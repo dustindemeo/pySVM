@@ -5,6 +5,7 @@ import itertools
 from sklearn.svm import SVC
 from sklearn import preprocessing
 from SplitWindow import SplitWindow
+from SVMWindow import SVMWindow
 import SVM
 from Variable import Variable
 
@@ -29,7 +30,7 @@ class Gui(Frame):
         fileMenu.add_command(label="Exit", command=self.onExit)
         menubar.add_cascade(label="File", menu=fileMenu)
         
-	self.topLeftFrame = LabelFrame(self.master, text='1. Manage Variables')
+        self.topLeftFrame = LabelFrame(self.master, text='1. Manage Variables')
         self.topLeftFrame.grid(row=0, column=0, sticky=NSEW)
         self.varCanvas = Canvas(self.topLeftFrame)
         self.varFrame = Frame(self.varCanvas)
@@ -46,7 +47,7 @@ class Gui(Frame):
         Label(self.varFrame, text="  Binary\n    DV").grid(row=0, column=3, sticky=W)
         Label(self.varFrame, text="\n     Skip").grid(row=0, column=4, sticky=W)
 
-	self.topRightFrame = LabelFrame(self.master, text='2. Manage Dependent Variable')
+        self.topRightFrame = LabelFrame(self.master, text='2. Manage Dependent Variable')
         self.topRightFrame.grid(row=0, column=2, sticky=NSEW)
         self.dvFrame = SplitWindow(self.topRightFrame, background='green')
         self.dvFrame.pack(fill=BOTH, expand=1, side=LEFT)
@@ -55,7 +56,19 @@ class Gui(Frame):
         self.bottomFrame.grid(row=1, column=0, columnspan=3, sticky=NSEW)
         self.svmFrame = Frame(self.bottomFrame, background='red')
         self.svmFrame.pack(fill=BOTH, expand=1, side=LEFT)
-        Button(self.svmFrame, text='Process', command=self.process).pack()
+        Label(self.svmFrame, text='Kernel').grid(column=0, row=0, sticky=W)
+        Checkbutton(self.svmFrame, text='rbf').grid(column=0, row=1, sticky=W)
+        Checkbutton(self.svmFrame, text='linear').grid(column=0, row=2, sticky=W)
+        Checkbutton(self.svmFrame, text='poly').grid(column=0, row=3, sticky=W)
+        Checkbutton(self.svmFrame, text='sigmoid').grid(column=0, row=4, sticky=W)
+        Checkbutton(self.svmFrame, text='precomputed').grid(column=0, row=5, sticky=W)
+        Label(self.svmFrame, text='C', anchor=E).grid(column=1, row=0, sticky=E)
+        Entry(self.svmFrame, justify=RIGHT).grid(column=1, row=1, sticky=E)
+        Entry(self.svmFrame, justify=RIGHT).grid(column=1, row=2, sticky=E)
+        Entry(self.svmFrame, justify=RIGHT).grid(column=1, row=3, sticky=E)
+        Entry(self.svmFrame, justify=RIGHT).grid(column=1, row=4, sticky=E)
+        Entry(self.svmFrame, justify=RIGHT).grid(column=1, row=5, sticky=E)
+        Button(self.svmFrame, text='Process', command=self.process).grid(column=0, row=6, sticky=EW)
 
     def getMaskRow(self):
         maskRow = set()
