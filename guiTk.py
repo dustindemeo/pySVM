@@ -56,6 +56,7 @@ class Gui(Frame):
         self.bottomFrame.grid(row=1, column=0, columnspan=3, sticky=NSEW)
         self.svmFrame = SVMWindow(self.bottomFrame)
         self.svmFrame.pack(fill=BOTH, expand=1, side=LEFT)
+        Button(self.bottomFrame, text='Run', command=self.process).pack()
 
     def getMaskRow(self):
         maskRow = set()
@@ -155,13 +156,10 @@ class Gui(Frame):
        
        top = Toplevel()
        top.title(variable.name)
-
+       Label(top, text=variable.name).pack()
        values = '\n'.join(variable.values)
-       msg = Message(top, text=values)
-       msg.pack()
-
-       button = Button(top, text="Dismiss", command=top.destroy)
-       button.pack()
+       Message(top, text=values).pack()
+       Button(top, text="Dismiss", command=top.destroy).pack()
        return None
 
     def clickRadio(self, variable):
