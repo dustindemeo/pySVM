@@ -20,7 +20,7 @@ class EntryFrame(Frame):
     def __init__(self, master, default, **args):
         Frame.__init__(self, master, args)
         validateNumber = self.register(isValid)
-        self.canvas = Canvas(self)
+        self.canvas = Canvas(self, height='4c', width='2c')
         self.frame = Frame(self.canvas, args)
         self.sb = Scrollbar(self, orient='vertical', command = self.canvas.yview)
         self.sb.grid(row=0, column=1, sticky=NSEW)
@@ -33,14 +33,14 @@ class EntryFrame(Frame):
         self.lastRow = 0
         self.entryVariables = []
         self.entryWidgets = []
-        self.addButton = Button(self.frame, text='Add', command=self.addEntry)
+        self.addButton = Button(self.frame, text='+', command=self.addEntry)
         self.addButton.grid(column=0, row=self.lastRow)
-        self.removeButton = Button(self.frame, text='Remove', command=self.removeEntry)
+        self.removeButton = Button(self.frame, text='-', command=self.removeEntry)
         self.removeButton.grid(column=1, row=self.lastRow)
         self.lastRow += 1
         self.entryVariables.append(StringVar())
         self.entryVariables[-1].set(default)
-        self.entryWidgets.append(Entry(self.frame, justify=RIGHT, textvariable=self.entryVariables[-1], validate='key', validatecommand=(validateNumber, '%P')))
+        self.entryWidgets.append(Entry(self.frame, justify=RIGHT, width=8, textvariable=self.entryVariables[-1], validate='key', validatecommand=(validateNumber, '%P')))
         self.entryWidgets[-1].grid(column=0, columnspan=2, row=self.lastRow)
         self.lastRow += 1
 
@@ -48,7 +48,7 @@ class EntryFrame(Frame):
         validateNumber = self.register(isValid)
         self.entryVariables.append(StringVar())
         self.entryVariables[-1].set(self.default)
-        self.entryWidgets.append(Entry(self.frame, justify=RIGHT, textvariable=self.entryVariables[-1], validate='key', validatecommand=(validateNumber, '%P')))
+        self.entryWidgets.append(Entry(self.frame, justify=RIGHT, width=8, textvariable=self.entryVariables[-1], validate='key', validatecommand=(validateNumber, '%P')))
         self.entryWidgets[-1].grid(column=0, columnspan=2, row=self.lastRow)
         self.lastRow += 1
 
