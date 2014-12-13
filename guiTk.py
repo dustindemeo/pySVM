@@ -114,7 +114,10 @@ class Gui(Frame):
             temp.append(self.variables[self.indexDV].catDict[v])
         y = np.delete(np.asarray(temp).T, maskRow, axis=0)
 
-        SVM.skSVM(X, y)
+        scoring = self.svmFrame.getScores()
+        tuned_parameters = self.svmFrame.getTunedParameters()
+
+        SVM.skSVM(X, y, scoring, tuned_parameters)
 
     def setSelectedType(self, variable):
         if variable.selectedType.get() == 'Binary DV' and not self.indexDV == variable.index:

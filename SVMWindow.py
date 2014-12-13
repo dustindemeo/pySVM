@@ -82,22 +82,26 @@ class SVMWindow(Frame):
     def getTunedParameters(self):
         tuned_parameters = []
         C = list(set(self.cFrame.getValues()))
+        C = [float(x) for x in C]
         C.sort(reverse=True)
         gamma = list(set(self.gammaFrame.getValues()))
+        gamma = [float(x) for x in gamma]
         gamma.sort(reverse=True)
         coef0 = list(set(self.coefFrame.getValues()))
+        coef0 = [float(x) for x in coef0]
         coef0.sort(reverse=True)
         degree = list(set(self.degreeFrame.getValues()))
+        degree = [float(x) for x in degree]
         degree.sort(reverse=True)
 
         if self.rbfVariable.get() == 1:
-            tuned_parameters.append({'kernel':'rbf', 'C':C, 'gamma':gamma})
+            tuned_parameters.append({'kernel':['rbf'], 'C':C, 'gamma':gamma})
         if self.linearVariable.get() == 1:
-            tuned_parameters.append({'kernel':'linear', 'C':C})
+            tuned_parameters.append({'kernel':['linear'], 'C':C})
         if self.sigmoidVariable.get() == 1:
-            tuned_parameters.append({'kernel':'sigmoid', 'C':C, 'gamma':gamma, 'coef0':coef0})
+            tuned_parameters.append({'kernel':['sigmoid'], 'C':C, 'gamma':gamma, 'coef0':coef0})
         if self.polyVariable.get() == 1:
-            tuned_parameters.append({'kernel':'poly', 'C':C, 'gamma':gamma, 'coef0':coef0, 'degree':degree})
+            tuned_parameters.append({'kernel':['poly'], 'C':C, 'gamma':gamma, 'coef0':coef0, 'degree':degree})
 
         return tuned_parameters
 
