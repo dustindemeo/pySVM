@@ -20,7 +20,7 @@ class EntryFrame(Frame):
     def __init__(self, master, default, **args):
         Frame.__init__(self, master, args)
         validateNumber = self.register(isValid)
-        self.canvas = Canvas(self, height='4c', width='2c')
+        self.canvas = Canvas(self, height='5c', width='2c')
         self.frame = Frame(self.canvas, args)
         self.sb = Scrollbar(self, orient='vertical', command = self.canvas.yview)
         self.sb.grid(row=0, column=1, sticky=NSEW)

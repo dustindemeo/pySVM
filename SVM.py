@@ -6,10 +6,10 @@ from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import classification_report, accuracy_score, precision_score, recall_score, f1_score
 from sklearn.cross_validation import cross_val_score, KFold, StratifiedKFold, LeaveOneOut, LeavePOut, ShuffleSplit, StratifiedShuffleSplit
 
-def skSVM(X, y, scoring, tuned_parameters, test_size, n_folds):
+def skSVM(X, y, scoring, tuned_parameters, test_size, cv_parameters):
 
-    split = KFold(n=len(y), n_folds=int(1./test_size), shuffle=True, random_state=42)
-    split = StratifiedKFold(y=y, n_folds=int(1./test_size), shuffle=True, random_state=42)
+    split = KFold(n=len(y), n_folds=int(1./test_size), shuffle=True, random_state=40)
+    split = StratifiedKFold(y=y, n_folds=int(1./test_size), shuffle=True, random_state=40)
 
     for train, test in split:
         X_train = X[train]
@@ -21,22 +21,24 @@ def skSVM(X, y, scoring, tuned_parameters, test_size, n_folds):
     print "Starting the gridding process."
     print
 
-    # CODE INTO GUI
-    p = 2
-    n_iter = 10
-    ts = .25
-
     numLabel1 = np.count_nonzero(y_train)
     numLabel0 = len(y_train) - numLabel1
     numFiveFolds = len(y_train) % 5
-    n_folds = min(n_folds, numLabel0, numLabel1, numFiveFolds)
 
-    cv = KFold(n=len(y_train), n_folds=n_folds, shuffle=True, random_state=42)
-    cv = StratifiedKFold(y=y_train, n_folds=n_folds, shuffle=True, random_state=42)
-    cv = LeaveOneOut(n=len(y_train))
-    cv = LeavePOut(n=len(y_train), p=p)
-    cv = ShuffleSplit(n=len(y_train), n_iter=n_iter, test_size=ts, random_state=42)
-    cv = StratifiedShuffleSplit(y=y_train, n_iter=n_iter, test_size=ts, random_state=42)
+    if cv_parameters['cvType'] == 'skf':
+        n_folds = min(cv_parameters['folds'], numLabel0, numLabel1, numFiveFolds)
+        cv = StratifiedKFold(y=y_train, n_folds=n_folds, shuffle=True, random_state=42)
+    elif cv_parameters['cvType'] == 'kf':
+        n_folds = min(cv_parameters['folds'], numLabel0, numLabel1, numFiveFolds)
+        cv = KFold(n=len(y_train), n_folds=n_folds, shuffle=True, random_state=42)
+    elif cv_parameters['cvType'] == 'sss':
+        cv = StratifiedShuffleSplit(y=y_train, n_iter=cv_parameters['nIter'], test_size=cv_parameters['testSize'], random_state=42)
+    elif cv_parameters['cvType'] == 'ss':
+        cv = ShuffleSplit(n=len(y_train), n_iter=cv_parameters['nIter'], test_size=cv_parameters['testSize'], random_state=42)
+    elif cv_parameters['cvType'] == 'lolo':
+        cv = LeaveOneOut(n=len(y_train))
+    elif cv_parameters['cvType'] == 'lplo':
+        cv = LeavePOut(n=len(y_train), p=cv_parameters['p'])
 
     grid = GridSearchCV(estimator=SVC(), param_grid=tuned_parameters, scoring = scoring, cv=cv)
     grid.fit(X_train, y_train)
