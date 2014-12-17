@@ -117,7 +117,7 @@ class Gui(Frame):
         scoring = self.svmFrame.getScores()
         tuned_parameters = self.svmFrame.getTunedParameters()
 
-        SVM.skSVM(X, y, scoring, tuned_parameters, 0.2)
+        SVM.skSVM(X, y, scoring, tuned_parameters, 0.2, 3)
 
     def setSelectedType(self, variable):
         if variable.selectedType.get() == 'Binary DV' and not self.indexDV == variable.index:
