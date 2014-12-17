@@ -10,21 +10,21 @@ class SVMWindow(Frame):
         self.accuracyVariable = IntVar()
         self.accuracyCheckbutton = Checkbutton(self.scoring, text='accuracy', variable=self.accuracyVariable)
         self.accuracyCheckbutton.grid(column=0, row=0, sticky=W)
-        self.average_precisionVariable = IntVar()
-        self.average_precisionCheckbutton = Checkbutton(self.scoring, text='avg precision', variable=self.average_precisionVariable)
-        self.average_precisionCheckbutton.grid(column=0, row=1, sticky=W)
-        self.f1Variable = IntVar()
-        self.f1Checkbutton = Checkbutton(self.scoring, text='f1', variable=self.f1Variable)
-        self.f1Checkbutton.grid(column=0, row=2, sticky=W)
         self.precisionVariable = IntVar()
         self.precisionCheckbutton = Checkbutton(self.scoring, text='precision', variable=self.precisionVariable)
-        self.precisionCheckbutton.grid(column=0, row=3, sticky=W)
+        self.precisionCheckbutton.grid(column=0, row=1, sticky=W)
         self.recallVariable = IntVar()
         self.recallCheckbutton = Checkbutton(self.scoring, text='recall', variable=self.recallVariable)
-        self.recallCheckbutton.grid(column=0, row=4, sticky=W)
-        self.roc_aucVariable = IntVar()
-        self.roc_aucCheckbutton = Checkbutton(self.scoring, text='roc_auc', variable=self.roc_aucVariable)
-        self.roc_aucCheckbutton.grid(column=0, row=5, sticky=W)
+        self.recallCheckbutton.grid(column=0, row=2, sticky=W)
+        self.f1Variable = IntVar()
+        self.f1Checkbutton = Checkbutton(self.scoring, text='f1', variable=self.f1Variable)
+        self.f1Checkbutton.grid(column=0, row=3, sticky=W)
+        #self.average_precisionVariable = IntVar()
+        #self.average_precisionCheckbutton = Checkbutton(self.scoring, text='avg precision', variable=self.average_precisionVariable)
+        #self.average_precisionCheckbutton.grid(column=0, row=4, sticky=W)
+        #self.roc_aucVariable = IntVar()
+        #self.roc_aucCheckbutton = Checkbutton(self.scoring, text='roc_auc', variable=self.roc_aucVariable)
+        #self.roc_aucCheckbutton.grid(column=0, row=5, sticky=W)
 
         self.kernel = LabelFrame(self, text='Kernels')
         self.kernel.grid(column=1, row=0, sticky=NSEW)
@@ -67,16 +67,16 @@ class SVMWindow(Frame):
         scores = []
         if self.accuracyVariable.get() == 1:
             scores.append('accuracy')
-        if self.average_precisionVariable.get() == 1:
-            scores.append('average_precision')
-        if self.f1Variable.get() == 1:
-            scores.append('f1')
         if self.precisionVariable.get() == 1:
             scores.append('precision')
         if self.recallVariable.get() == 1:
             scores.append('recall')
-        if self.roc_aucVariable.get() == 1:
-            scores.append('roc_auc')
+        if self.f1Variable.get() == 1:
+            scores.append('f1')
+        #if self.average_precisionVariable.get() == 1:
+        #    scores.append('average_precision')
+        #if self.roc_aucVariable.get() == 1:
+        #    scores.append('roc_auc')
         return scores
 
     def getTunedParameters(self):

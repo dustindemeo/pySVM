@@ -108,7 +108,7 @@ class Gui(Frame):
         X = np.concatenate((sSIV, eCIV), axis=1)
 
         self.variables[self.indexDV].catDict = self.dvFrame.makeCatDict()
-        print self.variables[self.indexDV].catDict
+
         temp = []
         for v in self.variables[self.indexDV].values:
             temp.append(self.variables[self.indexDV].catDict[v])
@@ -167,7 +167,6 @@ class Gui(Frame):
 
     def clickRadio(self, variable):
         self.setSelectedType(variable)
-        print "{} to {}".format(variable.name, variable.selectedType.get())
 
     def onExit(self):
 
@@ -187,7 +186,7 @@ def main():
     root.columnconfigure(0, weight=1)
     root.rowconfigure(0, weight=1)
     gui = Gui(root)
-    root.geometry("1000x650+10+10")
+    root.geometry("1000x700+10+10")
     root.mainloop()  
 
 if __name__ == '__main__':
