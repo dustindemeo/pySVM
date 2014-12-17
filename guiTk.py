@@ -124,9 +124,8 @@ class Gui(Frame):
             if not self.indexDV == None:
                 self.variables[self.indexDV].selectedType.set(self.variables[self.indexDV].defaultType)
             self.indexDV = variable.index
-            variable.catDict = variable.makeCatDict()
             self.dvFrame.clear()
-            self.dvFrame.insertListRight(variable.catDict.keys())
+            self.dvFrame.insertListLeft(list(set(variable.values)))
         elif variable.selectedType.get() == 'Scalar IV':
             if not variable.defaultType == 'Scalar IV':
                 variable.selectedType.set(variable.defaultType)

@@ -38,84 +38,81 @@ def skSVM(X, y, scoring, tuned_parameters, test_size, n_folds):
     cv = ShuffleSplit(n=len(y_train), n_iter=n_iter, test_size=ts, random_state=42)
     cv = StratifiedShuffleSplit(y=y_train, n_iter=n_iter, test_size=ts, random_state=42)
 
-    for score in scoring:
-        grid = GridSearchCV(estimator=SVC(), param_grid=tuned_parameters, scoring = score, cv=cv)
-        grid.fit(X_train, y_train)
-        clf = grid.best_estimator_
-        clf.fit(X_train, y_train)
-        accuracy_scores = cross_val_score(clf, X_train, y_train, scoring='accuracy', cv=cv)
-        precision_scores = cross_val_score(clf, X_train, y_train, scoring='precision', cv=cv)
-        recall_scores = cross_val_score(clf, X_train, y_train, scoring='recall', cv=cv)
-        f1_scores = cross_val_score(clf, X_train, y_train, scoring='f1', cv=cv)
-        y_test_pred = clf.predict(X_test)
-        y_train_pred = clf.predict(X_train)
+    grid = GridSearchCV(estimator=SVC(), param_grid=tuned_parameters, scoring = scoring, cv=cv)
+    grid.fit(X_train, y_train)
+    clf = grid.best_estimator_
+    clf.fit(X_train, y_train)
+    accuracy_scores = cross_val_score(clf, X_train, y_train, scoring='accuracy', cv=cv)
+    precision_scores = cross_val_score(clf, X_train, y_train, scoring='precision', cv=cv)
+    recall_scores = cross_val_score(clf, X_train, y_train, scoring='recall', cv=cv)
+    f1_scores = cross_val_score(clf, X_train, y_train, scoring='f1', cv=cv)
+    y_test_pred = clf.predict(X_test)
+    y_train_pred = clf.predict(X_train)
 
-        print
-        print "ESTIMATOR SELECTED FOR OPTIMAL {}:".format(grid.get_params(deep=True)['scoring'].upper())
-        print "Parameters:"
-        pprint.pprint(grid.best_params_, width=1)
-        print "Cross-validation scores on training data:"
-        print "  Accuracy:  {:.1f} +/- {:.1f}%".format(accuracy_scores.mean() * 100, accuracy_scores.std() * 100)
-        print "  Precision: {:.1f} +/- {:.1f}%".format(precision_scores.mean() * 100, precision_scores.std() * 100)
-        print "  Recall:    {:.1f} +/- {:.1f}%".format(recall_scores.mean() * 100, recall_scores.std() * 100)
-        print "  F1:        {:.1f} +/- {:.1f}%".format(f1_scores.mean() * 100, f1_scores.std() * 100)
-        print "Trained estimator scores on training data:"
-        print "  Accuracy:  {:.1f}%".format(accuracy_score(y_train, y_train_pred)*100)
-        print "  Precision: {:.1f}%".format(precision_score(y_train, y_train_pred, average='weighted')*100)
-        print "  Recall:    {:.1f}%".format(recall_score(y_train, y_train_pred, average='weighted')*100)
-        print "  F1:        {:.1f}%".format(f1_score(y_train, y_train_pred, average='weighted')*100)
-        print "Trained estimator scores on testing data:"
-        print "  Accuracy:  {:.1f}%".format(accuracy_score(y_test, y_test_pred)*100)
-        print "  Precision: {:.1f}%".format(precision_score(y_test, y_test_pred, average='weighted')*100)
-        print "  Recall:    {:.1f}%".format(recall_score(y_test, y_test_pred, average='weighted')*100)
-        print "  F1:        {:.1f}%".format(f1_score(y_test, y_test_pred, average='weighted')*100)
-        print
-        '''
-        print "Grid scores:"
-        print grid.grid_scores_
-        print
-        print "Best estimator:"
-        print grid.best_estimator_
-        print 
-        print "Best score:"
-        print grid.best_score_
-        print
-        print "Best params:"
-        print grid.best_params_
-        print
-        print "Scorer:"
-        print grid.scorer_
-        print
-        print "test"
-        print y_test
-        print "pred"
-        print y_test_pred
-        print
-        '''
+    print
+    print "ESTIMATOR SELECTED FOR OPTIMAL {}:".format(grid.get_params(deep=True)['scoring'].upper())
+    print "Parameters:"
+    pprint.pprint(grid.best_params_, width=1)
+    print "Cross-validation scores on training data:"
+    print "  Accuracy:  {:.1f} +/- {:.1f}%".format(accuracy_scores.mean() * 100, accuracy_scores.std() * 100)
+    print "  Precision: {:.1f} +/- {:.1f}%".format(precision_scores.mean() * 100, precision_scores.std() * 100)
+    print "  Recall:    {:.1f} +/- {:.1f}%".format(recall_scores.mean() * 100, recall_scores.std() * 100)
+    print "  F1:        {:.1f} +/- {:.1f}%".format(f1_scores.mean() * 100, f1_scores.std() * 100)
+    print "Trained estimator scores on training data:"
+    print "  Accuracy:  {:.1f}%".format(accuracy_score(y_train, y_train_pred)*100)
+    print "  Precision: {:.1f}%".format(precision_score(y_train, y_train_pred, average='weighted')*100)
+    print "  Recall:    {:.1f}%".format(recall_score(y_train, y_train_pred, average='weighted')*100)
+    print "  F1:        {:.1f}%".format(f1_score(y_train, y_train_pred, average='weighted')*100)
+    print "Trained estimator scores on testing data:"
+    print "  Accuracy:  {:.1f}%".format(accuracy_score(y_test, y_test_pred)*100)
+    print "  Precision: {:.1f}%".format(precision_score(y_test, y_test_pred, average='weighted')*100)
+    print "  Recall:    {:.1f}%".format(recall_score(y_test, y_test_pred, average='weighted')*100)
+    print "  F1:        {:.1f}%".format(f1_score(y_test, y_test_pred, average='weighted')*100)
+    print
+    '''
+    print "Grid scores:"
+    print grid.grid_scores_
+    print
+    print "Best estimator:"
+    print grid.best_estimator_
+    print 
+    print "Best score:"
+    print grid.best_score_
+    print
+    print "Best params:"
+    print grid.best_params_
+    print
+    print "Scorer:"
+    print grid.scorer_
+    print
+    print "test"
+    print y_test
+    print "pred"
+    print y_test_pred
+    print
+    '''
 
+    print "Classification report on test set:"
+    print classification_report(y_test, y_test_pred)
 
-
-        print "Classification report on test set:"
-        print classification_report(y_test, y_test_pred)
-
-        '''
-        plt.set_cmap(pl.cm.Paired)
-        plt.figure(1)
-        plt.clf()
-        plt.scatter(X[:,0], X[:,1], c=y, zorder=10)
-        plt.scatter(X_test[:,0], X_test[:, 1], s=80, facecolors='none', zorder=10)
-        plt.axis('tight')
-        x_min = X[:,0].min()
-        x_max = X[:,0].max()
-        y_min = X[:,1].min()
-        y_max = X[:,1].max()
-        y_min = X[:,1].min()
-        y_max = X[:,1].max()
-        XX, YY = np.mgrid[x_min:x_max:200j, y_min:y_max:200j]
-        Z = clf.decision_function(np.c_[XX.ravel(), YY.ravel()])
-        # Put the result into a color plot
-        Z = Z.reshape(XX.shape)
-        plt.pcolormesh(XX, YY, Z > 0)
-        plt.contour(XX, YY, Z, colors=['k', 'k', 'k'], linestyles=['--', '-', '--'], levels=[-.5, 0, .5])
-        plt.title('Test')
-        '''
+    '''
+    plt.set_cmap(pl.cm.Paired)
+    plt.figure(1)
+    plt.clf()
+    plt.scatter(X[:,0], X[:,1], c=y, zorder=10)
+    plt.scatter(X_test[:,0], X_test[:, 1], s=80, facecolors='none', zorder=10)
+    plt.axis('tight')
+    x_min = X[:,0].min()
+    x_max = X[:,0].max()
+    y_min = X[:,1].min()
+    y_max = X[:,1].max()
+    y_min = X[:,1].min()
+    y_max = X[:,1].max()
+    XX, YY = np.mgrid[x_min:x_max:200j, y_min:y_max:200j]
+    Z = clf.decision_function(np.c_[XX.ravel(), YY.ravel()])
+    # Put the result into a color plot
+    Z = Z.reshape(XX.shape)
+    plt.pcolormesh(XX, YY, Z > 0)
+    plt.contour(XX, YY, Z, colors=['k', 'k', 'k'], linestyles=['--', '-', '--'], levels=[-.5, 0, .5])
+    plt.title('Test')
+    '''

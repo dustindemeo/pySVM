@@ -5,32 +5,29 @@ class SVMWindow(Frame):
     def __init__(self, master, **args):
         Frame.__init__(self, master, args)
         
-        self.scoring = LabelFrame(self, text='Scoring')
+        self.scoring = LabelFrame(self, text='Select Estimator Based on:')
         self.scoring.grid(column=0, row=0, sticky=NSEW)
-        self.accuracyVariable = IntVar()
-        self.accuracyCheckbutton = Checkbutton(self.scoring, text='accuracy', variable=self.accuracyVariable)
-        self.accuracyCheckbutton.grid(column=0, row=0, sticky=W)
-        self.precisionVariable = IntVar()
-        self.precisionCheckbutton = Checkbutton(self.scoring, text='precision', variable=self.precisionVariable)
-        self.precisionCheckbutton.grid(column=0, row=1, sticky=W)
-        self.recallVariable = IntVar()
-        self.recallCheckbutton = Checkbutton(self.scoring, text='recall', variable=self.recallVariable)
-        self.recallCheckbutton.grid(column=0, row=2, sticky=W)
-        self.f1Variable = IntVar()
-        self.f1Checkbutton = Checkbutton(self.scoring, text='f1', variable=self.f1Variable)
-        self.f1Checkbutton.grid(column=0, row=3, sticky=W)
-        #self.average_precisionVariable = IntVar()
-        #self.average_precisionCheckbutton = Checkbutton(self.scoring, text='avg precision', variable=self.average_precisionVariable)
-        #self.average_precisionCheckbutton.grid(column=0, row=4, sticky=W)
-        #self.roc_aucVariable = IntVar()
-        #self.roc_aucCheckbutton = Checkbutton(self.scoring, text='roc_auc', variable=self.roc_aucVariable)
-        #self.roc_aucCheckbutton.grid(column=0, row=5, sticky=W)
+        self.scoringVariable = StringVar()
+        self.accuracyRadiobutton = Radiobutton(self.scoring, text='Accuracy', variable=self.scoringVariable, value='accuracy', indicatoron=False, width=20)
+        self.accuracyRadiobutton.grid(column=0, row=0, sticky=W)
+        self.accuracyRadiobutton.select()
+        self.precisionRadiobutton = Radiobutton(self.scoring, text='Precision', variable=self.scoringVariable, value='precision', indicatoron=False, width=20)
+        self.precisionRadiobutton.grid(column=0, row=1, sticky=W)
+        self.recallRadiobutton = Radiobutton(self.scoring, text='Recall', variable=self.scoringVariable, value='recall', indicatoron=False, width=20)
+        self.recallRadiobutton.grid(column=0, row=2, sticky=W)
+        self.f1Radiobutton = Radiobutton(self.scoring, text='F1', variable=self.scoringVariable, value='f1', indicatoron=False, width=20)
+        self.f1Radiobutton.grid(column=0, row=3, sticky=W)
+        self.avgPrecisionRadiobutton = Radiobutton(self.scoring, text='Avg. Precision', variable=self.scoringVariable, value='average_precision', indicatoron=False, width=20)
+        self.avgPrecisionRadiobutton.grid(column=0, row=4, sticky=W)
+        self.rocAUCRadiobutton = Radiobutton(self.scoring, text='ROC AUC', variable=self.scoringVariable, value='roc_auc', indicatoron=False, width=20)
+        self.rocAUCRadiobutton.grid(column=0, row=5, sticky=W)
 
         self.kernel = LabelFrame(self, text='Kernels')
         self.kernel.grid(column=1, row=0, sticky=NSEW)
         self.rbfVariable = IntVar()
         self.rbfCheckbutton = Checkbutton(self.kernel, text='rbf', variable=self.rbfVariable)
         self.rbfCheckbutton.grid(column=0, row=0, sticky=W)
+        self.rbfCheckbutton.select()
         self.linearVariable = IntVar()
         self.linearCheckbutton = Checkbutton(self.kernel, text='linear', variable=self.linearVariable)
         self.linearCheckbutton.grid(column=0, row=1, sticky=W)
@@ -64,20 +61,7 @@ class SVMWindow(Frame):
         Button(self, text='test', command=self.getTunedParameters).grid(column=6, row=0)
 
     def getScores(self):
-        scores = []
-        if self.accuracyVariable.get() == 1:
-            scores.append('accuracy')
-        if self.precisionVariable.get() == 1:
-            scores.append('precision')
-        if self.recallVariable.get() == 1:
-            scores.append('recall')
-        if self.f1Variable.get() == 1:
-            scores.append('f1')
-        #if self.average_precisionVariable.get() == 1:
-        #    scores.append('average_precision')
-        #if self.roc_aucVariable.get() == 1:
-        #    scores.append('roc_auc')
-        return scores
+        return self.scoringVariable.get()
 
     def getTunedParameters(self):
         tuned_parameters = []

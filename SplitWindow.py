@@ -10,7 +10,7 @@ def humanKey(key):
 class SplitWindow(Frame):
     def __init__(self, master, **args):
         Frame.__init__(self, master, args)
-        self.leftLabel = Label (self, text='Pass', borderwidth=1, relief=RAISED)
+        self.leftLabel = Label (self, text='Fail', borderwidth=1, relief=RAISED)
         self.leftLabel.grid(row=0, column=0, sticky=EW)
         self.leftListbox = Listbox(self, width=20, borderwidth=0, selectborderwidth=0, relief=FLAT, exportselection=FALSE)
         self.leftListbox.grid(row=1, column=0)
@@ -24,7 +24,7 @@ class SplitWindow(Frame):
         self.leftScrollbar.grid(row=0, column=1, rowspan=2, sticky=NS)
         self.leftListbox['yscrollcommand']=self.leftScrollbar.set
 
-        self.rightLabel = Label (self, text='Fail', borderwidth=1, relief=RAISED)
+        self.rightLabel = Label (self, text='Pass', borderwidth=1, relief=RAISED)
         self.rightLabel.grid(row=0, column=3, sticky=EW)
         self.rightListbox = Listbox(self, width=20, borderwidth=0, selectborderwidth=0, relief=FLAT, exportselection=FALSE)
         self.rightListbox.grid(row=1, column=3)
@@ -78,9 +78,9 @@ class SplitWindow(Frame):
     def makeCatDict(self):
         catDict = {}
         for v in self.leftListbox.get(0, END):
-            catDict[v] = 1
-        for v in self.rightListbox.get(0, END):
             catDict[v] = 0
+        for v in self.rightListbox.get(0, END):
+            catDict[v] = 1
         return catDict
 
     def scrollLeft(self, *args):
