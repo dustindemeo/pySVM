@@ -67,16 +67,15 @@ class Gui(Frame):
         self.svmFrame = SVMWindow(self.bottomFrame)
         self.svmFrame.pack(fill=BOTH, expand=1, side=LEFT)
         Button(self.bottomFrame, text='Run', command=self.process).pack()
-'''
-Maskrow function is designed to mask the list of row that this function outputs.
-That list are to be eliminated & not to be shown  in the interactive gui.
-If the variable type is skip then then the value or row is pushed to a list.
-With this function we get a list of row to be masked.
-'''
-
 
 
     def getMaskRow(self):
+        '''
+        Maskrow function is designed to mask the list of row that this function outputs.
+        That list are to be eliminated & not to be shown  in the interactive gui.
+        If the variable type is skip then then the value or row is pushed to a list.
+        With this function we get a list of row to be masked.
+        '''
         maskRow = set()
         for variable in self.variables:
             if not variable.selectedType.get() == 'Skip':
@@ -85,13 +84,12 @@ With this function we get a list of row to be masked.
                         maskRow.add(i)
         return list(maskRow)
 
-'''
-Description : Process function is designed to pull all the function , load the data & process in the gui.Initially all the scores, tuned parameter ,categorical variable parameters & data parameters from svm frame are assigned to respective values.
-The mask row list generated from mask row function  is loaded to mask row value.
-The imputer parameters are given to Scalar IV, Categorical IV & binary DV then these values are assigned to the respective imputer parameters.
-'''
-
     def process(self):
+        '''
+        Description : Process function is designed to pull all the function , load the data & process in the gui.Initially all the scores, tuned parameter ,categorical variable parameters & data parameters from svm frame are assigned to respective values.
+        The mask row list generated from mask row function  is loaded to mask row value.
+        The imputer parameters are given to Scalar IV, Categorical IV & binary DV then these values are assigned to the respective imputer parameters.
+        '''
         scoring = self.svmFrame.getScores()
         tuned_parameters = self.svmFrame.getTunedParameters()
         cv_parameters = self.svmFrame.getCVParameters()
@@ -171,12 +169,13 @@ The imputer parameters are given to Scalar IV, Categorical IV & binary DV then t
                 variable.selectedType.set(variable.defaultType)
 
     def AuxscrollFunction(self, event):
+        '''
+        On open function is implemented to display contents in the gui.All the contents of csv file are loaded & customized to display here.
+        The headers are labelled & once the value is clicked , the list pops up in a separate dialog box.
+        The main configuration here is the implementation of radio buttons for all the categories mentioned where the user can categorize these variables.
+        '''
         self.varCanvas.configure(scrollregion=self.varCanvas.bbox("all"))
-'''
-On open function is implemented to display contents in the gui.All the contents of csv file are loaded & customized to display here.
-The headers are labelled & once the value is clicked , the list pops up in a separate dialog box.
-The main configuration here is the implementation of radio buttons for all the categories mentioned where the user can categorize these variables.
-'''
+
     def onOpen(self):
 
         ftypes = [('CSV files', '*.csv'), ('All files', '*')]
