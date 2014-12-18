@@ -56,68 +56,20 @@ def skSVM(X, y, scoring, tuned_parameters, data_parameters, cv_parameters):
     print "ESTIMATOR SELECTED FOR OPTIMAL {}:".format(grid.get_params(deep=True)['scoring'].upper())
     print "Parameters:"
     pprint.pprint(grid.best_params_, width=1)
+    print
     print "Cross-validation scores on training data:"
     print "  Accuracy:  {:.1f} +/- {:.1f}%".format(accuracy_scores.mean() * 100, accuracy_scores.std() * 100)
     print "  Precision: {:.1f} +/- {:.1f}%".format(precision_scores.mean() * 100, precision_scores.std() * 100)
     print "  Recall:    {:.1f} +/- {:.1f}%".format(recall_scores.mean() * 100, recall_scores.std() * 100)
     print "  F1:        {:.1f} +/- {:.1f}%".format(f1_scores.mean() * 100, f1_scores.std() * 100)
-    '''
-    print "Trained estimator scores on training data:"
-    print "  Accuracy:  {:.1f}%".format(accuracy_score(y_train, y_train_pred)*100)
-    print "  Precision: {:.1f}%".format(precision_score(y_train, y_train_pred, average='weighted')*100)
-    print "  Recall:    {:.1f}%".format(recall_score(y_train, y_train_pred, average='weighted')*100)
-    print "  F1:        {:.1f}%".format(f1_score(y_train, y_train_pred, average='weighted')*100)
-    '''
+    print
     print "Trained estimator scores on testing data:"
     print "  Accuracy:  {:.1f}%".format(accuracy_score(y_test, y_test_pred)*100)
     print "  Precision: {:.1f}%".format(precision_score(y_test, y_test_pred, average='weighted')*100)
     print "  Recall:    {:.1f}%".format(recall_score(y_test, y_test_pred, average='weighted')*100)
     print "  F1:        {:.1f}%".format(f1_score(y_test, y_test_pred, average='weighted')*100)
     print
-    '''
-    print "Grid scores:"
-    print grid.grid_scores_
+    print "Trained estimator classification report on testing data:"
     print
-    print "Best estimator:"
-    print grid.best_estimator_
-    print 
-    print "Best score:"
-    print grid.best_score_
-    print
-    print "Best params:"
-    print grid.best_params_
-    print
-    print "Scorer:"
-    print grid.scorer_
-    print
-    print "test"
-    print y_test
-    print "pred"
-    print y_test_pred
-    print
-    '''
+    print classification_report(y_test, y_test_pred, target_names=['Fail', 'Pass'])
 
-    print "Classification report on test set:"
-    print classification_report(y_test, y_test_pred)
-
-    '''
-    plt.set_cmap(pl.cm.Paired)
-    plt.figure(1)
-    plt.clf()
-    plt.scatter(X[:,0], X[:,1], c=y, zorder=10)
-    plt.scatter(X_test[:,0], X_test[:, 1], s=80, facecolors='none', zorder=10)
-    plt.axis('tight')
-    x_min = X[:,0].min()
-    x_max = X[:,0].max()
-    y_min = X[:,1].min()
-    y_max = X[:,1].max()
-    y_min = X[:,1].min()
-    y_max = X[:,1].max()
-    XX, YY = np.mgrid[x_min:x_max:200j, y_min:y_max:200j]
-    Z = clf.decision_function(np.c_[XX.ravel(), YY.ravel()])
-    # Put the result into a color plot
-    Z = Z.reshape(XX.shape)
-    plt.pcolormesh(XX, YY, Z > 0)
-    plt.contour(XX, YY, Z, colors=['k', 'k', 'k'], linestyles=['--', '-', '--'], levels=[-.5, 0, .5])
-    plt.title('Test')
-    '''
