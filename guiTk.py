@@ -68,10 +68,17 @@ class Gui(Frame):
         return list(maskRow)
 
     def process(self):
+        scoring = self.svmFrame.getScores()
+        tuned_parameters = self.svmFrame.getTunedParameters()
+        cv_parameters = self.svmFrame.getCVParameters()
+        data_parameters = self.svmFrame.getDataParameters()
+
         maskRow = self.getMaskRow()
-        # - 1 because of header row in csv
-        # could also do numRow = len(self.variables[0].values)a- len(maskRow)
-        numRow = len(self.csv) - len(maskRow) - 1
+        imputerSIV = preprocessing.Imputer(missing_values='NaN', strategy=data_parameters['impute'], axis=0, copy=True)
+        imputerCIV = preprocessing.Imputer(missing_values='NaN', strategy='most_frequent', axis=0, copy=True)
+        imputerBDV = preprocessing.Imputer(missing_values='NaN', strategy='most_frequent', axis=1, copy=True)
+            
+        numRow = len(self.csv) - 1 #-1 because of header row in csv)
         numSIV = 0
         numCIV = 0
         for variable in self.variables:
@@ -79,13 +86,14 @@ class Gui(Frame):
                 numSIV += 1
             elif variable.selectedType.get() == 'Categorical IV':
                 numCIV += 1
+
         SIV = np.empty(shape=(numRow,numSIV))
         i = 0
         for variable in self.variables:
             if variable.selectedType.get() == 'Scalar IV':
-                SIV[:,i] = np.delete(np.asarray(variable.values).T, maskRow, axis=0)
+                SIV[:,i] = np.asarray(variable.values).T
                 i += 1
-        
+
         CIV = np.empty(shape=(numRow,numCIV))
         i = 0
         for variable in self.variables:
@@ -93,35 +101,39 @@ class Gui(Frame):
                 variable.catDict = variable.makeCatDict()
                 temp = []
                 for v in variable.values:
-                    temp.append(variable.catDict[v])
-                CIV[:,i] = np.delete(np.asarray(temp).T, maskRow, axis=0)
+                    temp.append(variable.catDict.get(v, None))
+                CIV[:,i] = np.asarray(temp).T
                 i += 1
 
-        self.stdScaler = preprocessing.StandardScaler().fit(SIV)
-        sSIV = self.stdScaler.transform(SIV)
-
-        self.encScaler = preprocessing.OneHotEncoder().fit(CIV)
-        eCIV = self.encScaler.transform(CIV).toarray()
-
-        #Use eSIV and eCIV if you want scaled and encoded data
-        #X = np.concatenate((SIV, CIV), axis=1)
-        X = np.concatenate((sSIV, eCIV), axis=1)
-
         self.variables[self.indexDV].catDict = self.dvFrame.makeCatDict()
-
         temp = []
         for v in self.variables[self.indexDV].values:
             temp.append(self.variables[self.indexDV].catDict[v])
-        y = np.delete(np.asarray(temp).T, maskRow, axis=0)
+        y = np.asarray(temp).T
+        
+        if data_parameters['cleanup'] == 'delete':
+            SIV = np.delete(SIV, maskRow, axis=0)
+            CIV = np.delete(CIV, maskRow, axis=0)
+            y = np.delete(y, maskRow, axis=0)
+        else:
+            imputerSIV.fit(SIV)
+            SIV = imputerSIV.transform(SIV)
+            imputerCIV.fit(CIV)
+            CIV = imputerCIV.transform(CIV)
+            imputerBDV.fit(y)
+            y = imputerBDV.transform(y)[0]
 
-        scoring = self.svmFrame.getScores()
-        tuned_parameters = self.svmFrame.getTunedParameters()
-        cv_parameters = self.svmFrame.getCVParameters()
-        print 'TEST'
-        print cv_parameters
-        print 'TEST\n'
+        if data_parameters['scale']:
+            self.stdScaler = preprocessing.StandardScaler().fit(SIV)
+            SIV = self.stdScaler.transform(SIV)
 
-        SVM.skSVM(X, y, scoring, tuned_parameters, 0.2, cv_parameters)
+        if data_parameters['oneHot']:
+            self.encScaler = preprocessing.OneHotEncoder().fit(CIV)
+            CIV = self.encScaler.transform(CIV).toarray()
+
+        X = np.concatenate((SIV, CIV), axis=1)
+
+        SVM.skSVM(X, y, scoring, tuned_parameters, data_parameters, cv_parameters)
 
     def setSelectedType(self, variable):
         if variable.selectedType.get() == 'Binary DV' and not self.indexDV == variable.index:

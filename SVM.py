@@ -6,10 +6,12 @@ from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import classification_report, accuracy_score, precision_score, recall_score, f1_score
 from sklearn.cross_validation import cross_val_score, KFold, StratifiedKFold, LeaveOneOut, LeavePOut, ShuffleSplit, StratifiedShuffleSplit
 
-def skSVM(X, y, scoring, tuned_parameters, test_size, cv_parameters):
+def skSVM(X, y, scoring, tuned_parameters, data_parameters, cv_parameters):
 
-    split = KFold(n=len(y), n_folds=int(1./test_size), shuffle=True, random_state=40)
-    split = StratifiedKFold(y=y, n_folds=int(1./test_size), shuffle=True, random_state=40)
+    if data_parameters['stratify']:
+        split = StratifiedKFold(y=y, n_folds=int(1./data_parameters['testSize']), shuffle=True, random_state=data_parameters['random'])
+    else:
+        split = KFold(n=len(y), n_folds=int(1./data_parameters['testSize']), shuffle=True, random_state=data_parameters['random'])
 
     for train, test in split:
         X_train = X[train]
@@ -24,17 +26,16 @@ def skSVM(X, y, scoring, tuned_parameters, test_size, cv_parameters):
     numLabel1 = np.count_nonzero(y_train)
     numLabel0 = len(y_train) - numLabel1
     numFiveFolds = len(y_train) % 5
+    n_folds = max(2, min(cv_parameters['folds'], numLabel0, numLabel1, numFiveFolds))
 
     if cv_parameters['cvType'] == 'skf':
-        n_folds = min(cv_parameters['folds'], numLabel0, numLabel1, numFiveFolds)
-        cv = StratifiedKFold(y=y_train, n_folds=n_folds, shuffle=True, random_state=42)
+        cv = StratifiedKFold(y=y_train, n_folds=n_folds, shuffle=True, random_state=data_parameters['random'])
     elif cv_parameters['cvType'] == 'kf':
-        n_folds = min(cv_parameters['folds'], numLabel0, numLabel1, numFiveFolds)
-        cv = KFold(n=len(y_train), n_folds=n_folds, shuffle=True, random_state=42)
+        cv = KFold(n=len(y_train), n_folds=n_folds, shuffle=True, random_state=data_parameters['random'])
     elif cv_parameters['cvType'] == 'sss':
-        cv = StratifiedShuffleSplit(y=y_train, n_iter=cv_parameters['nIter'], test_size=cv_parameters['testSize'], random_state=42)
+        cv = StratifiedShuffleSplit(y=y_train, n_iter=cv_parameters['nIter'], test_size=cv_parameters['testSize'], random_state=data_parameters['random'])
     elif cv_parameters['cvType'] == 'ss':
-        cv = ShuffleSplit(n=len(y_train), n_iter=cv_parameters['nIter'], test_size=cv_parameters['testSize'], random_state=42)
+        cv = ShuffleSplit(n=len(y_train), n_iter=cv_parameters['nIter'], test_size=cv_parameters['testSize'], random_state=data_parameters['random'])
     elif cv_parameters['cvType'] == 'lolo':
         cv = LeaveOneOut(n=len(y_train))
     elif cv_parameters['cvType'] == 'lplo':
@@ -60,11 +61,13 @@ def skSVM(X, y, scoring, tuned_parameters, test_size, cv_parameters):
     print "  Precision: {:.1f} +/- {:.1f}%".format(precision_scores.mean() * 100, precision_scores.std() * 100)
     print "  Recall:    {:.1f} +/- {:.1f}%".format(recall_scores.mean() * 100, recall_scores.std() * 100)
     print "  F1:        {:.1f} +/- {:.1f}%".format(f1_scores.mean() * 100, f1_scores.std() * 100)
+    '''
     print "Trained estimator scores on training data:"
     print "  Accuracy:  {:.1f}%".format(accuracy_score(y_train, y_train_pred)*100)
     print "  Precision: {:.1f}%".format(precision_score(y_train, y_train_pred, average='weighted')*100)
     print "  Recall:    {:.1f}%".format(recall_score(y_train, y_train_pred, average='weighted')*100)
     print "  F1:        {:.1f}%".format(f1_score(y_train, y_train_pred, average='weighted')*100)
+    '''
     print "Trained estimator scores on testing data:"
     print "  Accuracy:  {:.1f}%".format(accuracy_score(y_test, y_test_pred)*100)
     print "  Precision: {:.1f}%".format(precision_score(y_test, y_test_pred, average='weighted')*100)

@@ -1,13 +1,7 @@
 from Tkinter import *
 from EntryFrame import EntryFrame
 
-def isValid(str):
-    '''DESCRIPTION: This function determines if a string can be cast to a number or is empty
-       PRECONDITIONS: None. Any value can be given to isNumber
-       POSTCONDITIONS: True/False will be returned to the calling function.
-       SIDE EFFECTS: None.
-       RETURN: True if n is a number or empty. False if n is not a number.
-       '''
+def isPercent(str):
     if str == '':
         return True
     try:
@@ -15,7 +9,20 @@ def isValid(str):
     except ValueError:
         return False
 
-    if int(str) <= 80 and int(str) >0:
+    if int(str) <=80 and int(str) >= 1:
+        return True
+    else:
+        return False
+
+def isInt(str):
+    if str == '':
+        return True
+    try:
+        int(str)
+    except ValueError:
+        return False
+
+    if int(str) > 0:
         return True
     else:
         return False
@@ -23,7 +30,8 @@ def isValid(str):
 class SVMWindow(Frame):
     def __init__(self, master, **args):
         Frame.__init__(self, master, args)
-        validateInt = self.register(isValid)
+        validateInt = self.register(isInt)
+        validatePercent = self.register(isPercent)
         
         self.scoring = LabelFrame(self, text='A. Optimize Estimator for:')
         self.scoring.grid(column=0, row=0, sticky=NSEW)
@@ -86,6 +94,7 @@ class SVMWindow(Frame):
         self.crossValidationVariable = StringVar()
         self.stratifiedKFoldRadiobutton = Radiobutton(self.crossValidation, text='Stratified K-fold', variable=self.crossValidationVariable, value='skf', command=self.selectKFold)
         self.stratifiedKFoldRadiobutton.grid(column=0, columnspan=2, row=0, sticky=W)
+        self.stratifiedKFoldRadiobutton.select()
         self.kFoldRadiobutton = Radiobutton(self.crossValidation, text='K-fold', variable=self.crossValidationVariable, value='kf', command=self.selectKFold)
         self.kFoldRadiobutton.grid(column=0, columnspan=2, row=1, sticky=W)
         self.stratifiedShuffleSplitRadiobutton = Radiobutton(self.crossValidation, text='Strat. Shuffle Split', variable=self.crossValidationVariable, value='sss', command=self.selectShuffleSplit)
@@ -108,13 +117,63 @@ class SVMWindow(Frame):
         self.nIterEntry = Entry(self.crossValidation, justify=RIGHT, width=4, textvariable=self.nIterVariable, validate='key', validatecommand=(validateInt, '%P'))
         self.cvTestSizeVariable = StringVar()
         self.cvTestSizeVariable.set(25)
-        self.cvTestSizeLabel = Label(self.crossValidation, text='   Test Size(%)')
-        self.cvTestSizeEntry = Entry(self.crossValidation, justify=RIGHT, width=4, textvariable=self.cvTestSizeVariable, validate='key', validatecommand=(validateInt, '%P'))
+        self.cvTestSizeLabel = Label(self.crossValidation, text='   Test Size (%)')
+        self.cvTestSizeEntry = Entry(self.crossValidation, justify=RIGHT, width=4, textvariable=self.cvTestSizeVariable, validate='key', validatecommand=(validatePercent, '%P'))
         self.pVariable = StringVar()
         self.pVariable.set(3)
         self.pLabel = Label(self.crossValidation, text='   Leave P Out')
         self.pEntry = Entry(self.crossValidation, justify=RIGHT, width=4, textvariable=self.pVariable, validate='key', validatecommand=(validateInt, '%P'))
-        self.stratifiedKFoldRadiobutton.select()
+
+        self.data = LabelFrame(self, text='C. Data Processing:')
+        self.data.grid(column=2, row=0, sticky=NSEW)
+        self.testSizeVariable = StringVar()
+        self.testSizeVariable.set(25)
+        self.testSizeLabel = Label(self.data, text='   Test Size (%)')
+        self.testSizeLabel.grid(column=0, row=0, columnspan=2, sticky=W)
+        self.testSizeEntry = Entry(self.data, justify=RIGHT, width=4, textvariable=self.testSizeVariable, validate='key', validatecommand=(validatePercent, '%P'))
+        self.testSizeEntry.grid(column=2, row=0, columnspan=2, sticky=W)
+        self.stratifyVariable = IntVar()
+        self.stratifyCheckbutton = Checkbutton(self.data, text='Stratify Split', variable=self.stratifyVariable)
+        self.stratifyCheckbutton.grid(column=0, columnspan=4, row=1, sticky=W)
+        self.stratifyCheckbutton.select()
+        self.randomVariable = StringVar()
+        self.randomVariable.set(0)
+        self.randomLabel = Label(self.data, text='   Random Seed')
+        self.randomLabel.grid(column=0, row=2, columnspan=2, sticky=W)
+        self.randomEntry = Entry(self.data, justify=RIGHT, width=4, textvariable=self.randomVariable, validate='key', validatecommand=(validateInt, '%P'))
+        self.randomEntry.grid(column=2, row=2, columnspan=2, sticky=W)
+        self.scaleSIVVariable = IntVar()
+        self.scaleSIVCheckbutton = Checkbutton(self.data, text='Scale Scalar IV', variable=self.scaleSIVVariable)
+        self.scaleSIVCheckbutton.grid(column=0, columnspan=4, row=3, sticky=W)
+        self.scaleSIVCheckbutton.select()
+        self.oneHotEncodeCIVVariable = IntVar()
+        self.oneHotEncodeCIVCheckbutton = Checkbutton(self.data, text='Encode Cat. IV', variable=self.oneHotEncodeCIVVariable)
+        self.oneHotEncodeCIVCheckbutton.grid(column=0, columnspan=4, row=4, sticky=W)
+        self.oneHotEncodeCIVCheckbutton.select()
+        self.dataCleanupVariable = StringVar()
+        self.dataDeleteRadiobutton = Radiobutton(self.data, text='Delete Empty', variable=self.dataCleanupVariable, value='delete', command=self.selectDataDelete)
+        self.dataDeleteRadiobutton.grid(column=0, columnspan=4, row=5, sticky=W)
+        self.dataDeleteRadiobutton.select()
+        self.dataImputeRadiobutton = Radiobutton(self.data, text='Impute Empty', variable=self.dataCleanupVariable, value='impute', command=self.selectDataImpute)
+        self.dataImputeRadiobutton.grid(column=0, columnspan=4, row=6, sticky=W)
+        self.dataImputeMethodVariable = StringVar()
+        self.dataImputeMeanRadiobutton = Radiobutton(self.data, text='Mean', variable=self.dataImputeMethodVariable, value='mean', state=DISABLED)
+        self.dataImputeMeanRadiobutton.grid(column=1, row=7, sticky=W)
+        self.dataImputeMeanRadiobutton.select()
+        self.dataImputeMedianRadiobutton = Radiobutton(self.data, text='Median', variable=self.dataImputeMethodVariable, value='median', state=DISABLED)
+        self.dataImputeMedianRadiobutton.grid(column=1, row=8, sticky=W)
+        self.dataImputeModeRadiobutton = Radiobutton(self.data, text='Mode', variable=self.dataImputeMethodVariable, value='most_frequent', state=DISABLED)
+        self.dataImputeModeRadiobutton.grid(column=1, row=9, sticky=W)
+
+    def selectDataDelete(self):
+        self.dataImputeMeanRadiobutton.config(state=DISABLED)
+        self.dataImputeMedianRadiobutton.config(state=DISABLED)
+        self.dataImputeModeRadiobutton.config(state=DISABLED)
+
+    def selectDataImpute(self):
+        self.dataImputeMeanRadiobutton.config(state=NORMAL)
+        self.dataImputeMedianRadiobutton.config(state=NORMAL)
+        self.dataImputeModeRadiobutton.config(state=NORMAL)
 
     def selectKFold(self):
         self.foldsLabel.grid(column=0, row=6, sticky=W)
@@ -167,6 +226,17 @@ class SVMWindow(Frame):
         cv_parameters['testSize'] = int(self.cvTestSizeVariable.get())/100.
         cv_parameters['p'] = int(self.pVariable.get())
         return cv_parameters
+
+    def getDataParameters(self):
+        data_parameters = {}
+        data_parameters['testSize'] = int(self.testSizeVariable.get())/100.
+        data_parameters['stratify'] = bool(self.stratifyVariable.get())
+        data_parameters['random'] = int(self.randomVariable.get())
+        data_parameters['oneHot'] = bool(self.oneHotEncodeCIVVariable.get())
+        data_parameters['scale'] = bool(self.scaleSIVVariable.get())
+        data_parameters['cleanup'] = self.dataCleanupVariable.get()
+        data_parameters['impute'] = self.dataImputeMethodVariable.get()
+        return data_parameters
 
     def getTunedParameters(self):
         tuned_parameters = []
