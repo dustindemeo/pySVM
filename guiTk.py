@@ -5,7 +5,7 @@
 '''
 DESCRIPTION:
 This module holds  functions necessary to design & load the required data to Tk gui.
-It uses several functions like iniUI, Process & several functions to load the data in the perfect format 
+It uses several functions like iniUI, Process , Onopen & several functions to load the data in the perfect format 
 
 '''
 from Tkinter import *
@@ -172,7 +172,11 @@ The imputer parameters are given to Scalar IV, Categorical IV & binary DV then t
 
     def AuxscrollFunction(self, event):
         self.varCanvas.configure(scrollregion=self.varCanvas.bbox("all"))
-
+'''
+On open function is implemented to display contents in the gui.All the contents of csv file are loaded & customized to display here.
+The headers are labelled & once the value is clicked , the list pops up in a separate dialog box.
+The main configuration here is the implementation of radio buttons for all the categories mentioned where the user can categorize these variables.
+'''
     def onOpen(self):
 
         ftypes = [('CSV files', '*.csv'), ('All files', '*')]
