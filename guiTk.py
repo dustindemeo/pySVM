@@ -1,3 +1,13 @@
+#NAME: Variable.py
+#DATE CREATED: 12/10/2014
+#AUTHORS: Abhinandan Halemane, Dustin DeMeo, Mahshid Aimaq, Vinitha Raja
+
+'''
+DESCRIPTION:
+This module holds  functions necessary to design & load the required data to Tk gui.
+It uses several functions like iniUI, Process & several functions to load the data in the perfect format 
+
+'''
 from Tkinter import *
 import tkFileDialog 
 import numpy as np
@@ -57,6 +67,14 @@ class Gui(Frame):
         self.svmFrame = SVMWindow(self.bottomFrame)
         self.svmFrame.pack(fill=BOTH, expand=1, side=LEFT)
         Button(self.bottomFrame, text='Run', command=self.process).pack()
+'''
+Maskrow function is designed to mask the list of row that this function outputs.
+That list are to be eliminated & not to be shown  in the interactive gui.
+If the variable type is skip then then the value or row is pushed to a list.
+With this function we get a list of row to be masked.
+'''
+
+
 
     def getMaskRow(self):
         maskRow = set()
@@ -66,6 +84,12 @@ class Gui(Frame):
                     if value == '':
                         maskRow.add(i)
         return list(maskRow)
+
+'''
+Description : Process function is designed to pull all the function , load the data & process in the gui.Initially all the scores, tuned parameter ,categorical variable parameters & data parameters from svm frame are assigned to respective values.
+The mask row list generated from mask row function  is loaded to mask row value.
+The imputer parameters are given to Scalar IV, Categorical IV & binary DV then these values are assigned to the respective imputer parameters.
+'''
 
     def process(self):
         scoring = self.svmFrame.getScores()
